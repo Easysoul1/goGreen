@@ -1,3 +1,4 @@
+
 import jsonfile from "jsonfile";
 import moment from "moment";
 import simpleGit from "simple-git";
@@ -7,7 +8,7 @@ const path = "./data.json";
 
 const markCommit = (x, y) => {
   const date = moment()
-    .subtract(1, "y")
+    .subtract(6, "months")
     .add(1, "d")
     .add(x, "w")
     .add(y, "d")
@@ -22,19 +23,35 @@ const markCommit = (x, y) => {
   });
 };
 
-const makeCommits = (n) => {
-  if(n===0) return simpleGit().push();
-  const x = random.int(0, 54);
+const makeCommits = async (n) => {
+  if (n === 0) return simpleGit().push();
+  
+  const x = random.int(0, 25); // Adjusted for 6 months (approximately 26 weeks)
   const y = random.int(0, 6);
-  const date = moment().subtract(1, "y").add(1, "d").add(x, "w").add(y, "d").format();
+  const date = moment()
+    .subtract(6, "months")
+    .add(1, "d")
+    .add(x, "w")
+    .add(y, "d")
+    .format();
 
   const data = {
     date: date,
   };
   console.log(date);
-  jsonfile.writeFile(path, data, () => {
-    simpleGit().add([path]).commit(date, { "--date": date },makeCommits.bind(this,--n));
+  
+  await new Promise((resolve) => {
+    jsonfile.writeFile(path, data, () => {
+      simpleGit().add([path]).commit(date, { "--date": date }, () => {
+        resolve();
+      });
+    });
   });
+  
+  // 1-second delay between commits
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  await makeCommits(--n);
 };
 
-makeCommits(100);
+makeCommits(30);
