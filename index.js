@@ -1,3 +1,10 @@
+import jsonfile from "jsonfile";
+import moment from "moment";
+import simpleGit from "simple-git";
+import random from "random";
+
+const path = "./data.json";
+
 const markCommit = async (x, y) => {
   const date = moment()
     .subtract(6, "months")
